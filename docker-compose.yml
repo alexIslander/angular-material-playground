@@ -1,0 +1,13 @@
+version: "3.4"
+
+services:
+  angularmaterialplayground:
+    image: amp-image
+    container_name: amp-container
+    build: 
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - "4201:80"
+    restart: always
