@@ -1,0 +1,60 @@
+{
+    "extends": [
+      "stylelint-config-standard",
+      "stylelint-config-recommended-scss"
+    ],
+    "ignoreFiles": [
+      "dist/**"
+    ],
+    "plugins": [
+      "stylelint-scss"
+    ],
+    "rules": {
+      "at-rule-empty-line-before": [
+        "always",
+        { "except": ["first-nested"], "ignore": ["after-comment", "blockless-after-same-name-blockless"], "ignoreAtRules": ["else"] }
+      ],
+      "at-rule-no-vendor-prefix": true,      
+      "color-named": "never",
+      "declaration-block-no-redundant-longhand-properties": true,
+      "declaration-empty-line-before": [
+        "always",
+        { "except": ["first-nested"], "ignore": ["after-comment", "after-declaration",  "inside-single-line-block"] }
+      ],
+      "declaration-no-important": true,
+      "font-family-name-quotes": "always-unless-keyword",
+      "function-url-quotes": "always",
+      "function-whitespace-after": null,
+      "max-nesting-depth": 3,
+      "media-feature-name-no-vendor-prefix": true,
+      "no-unknown-animations": true,
+      "property-no-vendor-prefix": true,
+      "selector-attribute-quotes": "never",
+      "selector-no-vendor-prefix": true,
+      "selector-pseudo-element-no-unknown": [true, { "ignorePseudoElements": ["ng-deep"]}],
+      "selector-type-no-unknown": [true, { "ignoreTypes": ["/^mat-/", "/^app-/", "/^rex-/"]}],
+      "shorthand-property-no-redundant-values": true,      
+      "value-keyword-case": "lower",
+      "value-no-vendor-prefix": true,
+  
+      "scss/at-else-closing-brace-newline-after": "always-last-in-chain",
+      "scss/at-else-closing-brace-space-after": "always-intermediate",
+      "scss/at-else-empty-line-before": "never",
+      "scss/at-else-if-parentheses-space-before": "always",
+      "scss/at-extend-no-missing-placeholder": true,
+      "scss/at-function-parentheses-space-before": "never",
+      "scss/at-if-closing-brace-newline-after": "always-last-in-chain",
+      "scss/at-if-closing-brace-space-after": "always-intermediate",
+      "scss/at-import-no-partial-leading-underscore": true,
+      "scss/at-mixin-argumentless-call-parentheses": "never",
+      "scss/at-mixin-parentheses-space-before": "never",
+      "scss/dollar-variable-colon-space-after": "always-single-line",
+      "scss/dollar-variable-colon-space-before": "never",
+      "scss/dollar-variable-no-missing-interpolation": true,
+      "scss/double-slash-comment-empty-line-before": "always",
+      "scss/double-slash-comment-whitespace-inside": "always",
+      "scss/declaration-nested-properties-no-divided-groups": true,
+      "scss/operator-no-newline-after": true,
+      "scss/selector-no-redundant-nesting-selector": true
+    }
+  }
