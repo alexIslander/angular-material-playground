@@ -9,7 +9,15 @@
     "test": "jest --coverage",
     "lint": "ng lint",
     "lint-scss": "stylelint **/*.scss",
-    "lint-scss-fix": "stylelint **/*.scss --fix"
+    "lint-scss-fix": "stylelint **/*.scss --fix",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "src/**/*.scss": "npm run lint-scss",
+    "src/**/*.{ts,scss,html}": [
+      "npm run lint-ts",
+      "prettier --write"
+    ]
   },
   "private": true,
   "dependencies": {
@@ -42,8 +50,10 @@
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
     "jest": "^29.6.2",
     "jest-preset-angular": "^13.1.1",
+    "lint-staged": "^13.2.3",
     "prettier": "^3.0.1",
     "stylelint": "^15.10.2",
     "stylelint-config-recommended-scss": "^12.0.0",
