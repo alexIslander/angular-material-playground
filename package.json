@@ -4,13 +4,15 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build",    
+    "test": "jest --coverage"    ,
+    "build:ci": "ng build --configuration production",
+    "test:ci": "jest --ci",
     "watch": "ng build --watch --configuration development",
-    "test": "jest --coverage",
     "lint": "ng lint",
     "lint-scss": "stylelint **/*.scss",
     "lint-scss-fix": "stylelint **/*.scss --fix",
-    "prepare": "husky install"
+    "prod-build-lint": "npm run build:ci && npm run lint-ts && npm run lint-scss && npm run test:ci"
   },
   "lint-staged": {
     "src/**/*.scss": "npm run lint-scss",
