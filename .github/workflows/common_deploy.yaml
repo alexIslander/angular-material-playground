@@ -1,0 +1,59 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      cf_pages_project:
+        description: The name of the Cloudflare Pages project
+        required: true
+        type: string
+      build_command:
+        description: Build command that produces the static output
+        required: true
+        type: string
+      build_output_dir:
+        description: Path to the built static output directory
+        required: true
+        type: string
+      node_version:
+        description: Node version used for install and build
+        required: false
+        default: 18.x
+        type: string
+    secrets:
+      api_token:
+        description: The Cloudflare API token
+        required: true
+      account_id:
+        description: The Cloudflare account ID
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: ${{ inputs.build_command }}
+
+      - name: Install Wrangler
+        run: npm install -g @cloudflare/wrangler
+
+      - name: Deploy
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.api_token }}
+          accountId: ${{ secrets.account_id }}
+          wranglerVersion: "3.86.1"
+          command: pages deploy ${{ inputs.build_output_dir }} --project-name=${{ inputs.cf_pages_project }}

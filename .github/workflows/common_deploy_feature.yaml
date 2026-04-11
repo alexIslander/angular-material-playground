@@ -1,0 +1,85 @@
+name: Deploy Feature
+
+on:
+  workflow_call:
+    inputs:
+      cf_pages_project:
+        description: The name of the Cloudflare Pages project
+        required: true
+        type: string
+      build_command:
+        description: Build command that produces the static output
+        required: true
+        type: string
+      build_output_dir:
+        description: Path to the built static output directory
+        required: true
+        type: string
+      node_version:
+        description: Node version used for install and build
+        required: false
+        default: 18.x
+        type: string
+      deployment_comment_tag:
+        description: Stable tag used for pull request deployment comments
+        required: true
+        type: string
+      deployment_label:
+        description: Friendly label shown in the deployment comment
+        required: true
+        type: string
+    secrets:
+      api_token:
+        description: The Cloudflare API token
+        required: true
+      account_id:
+        description: The Cloudflare account ID
+        required: true
+
+jobs:
+  deploy-feature:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: ${{ inputs.build_command }}
+
+      - name: Install Wrangler
+        run: npm install -g @cloudflare/wrangler
+
+      - name: Get last commit details
+        run: |
+          BRANCH_REF=${{ github.event.pull_request.head.ref }}
+          git fetch origin "$BRANCH_REF"
+          {
+            echo "commit_message<<EOF"
+            git log -1 FETCH_HEAD --pretty=format:%s
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+          echo "commit_hash=$(git log -1 FETCH_HEAD --pretty=format:%H)" >> "$GITHUB_ENV"
+
+      - name: Deploy
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.api_token }}
+          accountId: ${{ secrets.account_id }}
+          wranglerVersion: "3.86.1"
+          command: pages deploy ${{ inputs.build_output_dir }} --project-name=${{ inputs.cf_pages_project }} --branch ${{ github.head_ref || github.ref_name }} --commit-message "${{ env.commit_message }}" --commit-hash "${{ env.commit_hash }}"
+
+      - name: Add deployment link
+        uses: thollander/actions-comment-pull-request@e2c37e53a7d2227b61585343765f73a9ca57eda9
+        with:
+          comment-tag: ${{ inputs.deployment_comment_tag }}
+          message: |
+            :rocket: **${{ inputs.deployment_label }}** deployment succeeded, accessible via [${{ steps.deploy.outputs.deployment-url }}](${{ steps.deploy.outputs.deployment-url }})
