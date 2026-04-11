@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, dev, feature/* ]
+  pull_request:
+    branches: [ master, dev, feature/* ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build -- --configuration production
+
+  deploy-feature:
+    if: ${{ github.event_name == 'pull_request' && vars.CLOUDFLARE_PAGES_PROJECT != '' }}
+    needs: [ build ]
+    uses: ./.github/workflows/common_deploy_feature.yaml
+    with:
+      cf_pages_project: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+      build_command: npm run build -- --configuration production
+      build_output_dir: dist/angular-material-playground
+      node_version: 18.x
+      deployment_comment_tag: feature-deployment-angular-material-playground
+      deployment_label: Angular Material Playground
+    secrets:
+      api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  deploy:
+    if: ${{ github.event_name == 'push' && vars.CLOUDFLARE_PAGES_PROJECT != '' }}
+    needs: [ build ]
+    uses: ./.github/workflows/common_deploy.yaml
+    with:
+      cf_pages_project: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+      build_command: npm run build -- --configuration production
+      build_output_dir: dist/angular-material-playground
+      node_version: 18.x
+    secrets:
+      api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
