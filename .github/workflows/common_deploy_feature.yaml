@@ -61,11 +61,7 @@ jobs:
         run: |
           BRANCH_REF=${{ github.event.pull_request.head.ref }}
           git fetch origin "$BRANCH_REF"
-          {
-            echo "commit_message<<EOF"
-            git log -1 FETCH_HEAD --pretty=format:%s
-            echo "EOF"
-          } >> "$GITHUB_ENV"
+          echo "commit_message=$(git log -1 FETCH_HEAD --pretty=format:%s)" >> "$GITHUB_ENV"
           echo "commit_hash=$(git log -1 FETCH_HEAD --pretty=format:%H)" >> "$GITHUB_ENV"
 
       - name: Deploy
